@@ -23,6 +23,8 @@ typedef uint16_t word;
 extern "C"{
 #endif // __cplusplus
 
+#include "nrf_gpio.h"
+
 #include "wiring_constants.h"
 
 #define clockCyclesPerMicrosecond() ( SystemCoreClock / 1000000L )
@@ -45,7 +47,7 @@ void loop( void ) ;
 #ifdef __cplusplus
   #include "WCharacter.h"
   #include "WString.h"
-  // #include "Tone.h"
+  //#include "Tone.h"
   #include "WMath.h"
   #include "HardwareSerial.h"
   #include "pulse.h"
@@ -54,6 +56,7 @@ void loop( void ) ;
 #include "binary.h"
 #ifdef __cplusplus
   #include "Uart.h"
+  #include "SoftDeviceManager.h"
 #endif
 
 // Include board variant

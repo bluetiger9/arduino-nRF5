@@ -32,6 +32,8 @@ int main( void )
 
   delay(1);
 
+  SDManager.begin();
+
   setup();
 
   for (;;)

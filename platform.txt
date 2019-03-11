@@ -54,7 +54,7 @@ build.lfclk_flags=
 
 nrf.sdk.path={build.core.path}/SDK
 
-compiler.nrf.flags=-DNRF5 "-I{nrf.sdk.path}/components/toolchain/" "-I{nrf.sdk.path}/components/toolchain/CMSIS/Include" "-I{nrf.sdk.path}/components/toolchain/gcc/" "-I{nrf.sdk.path}/components/device/" "-I{nrf.sdk.path}/components/drivers_nrf/delay/" "-I{nrf.sdk.path}/components/softdevice/{softdevice}/headers/"
+compiler.nrf.flags=-DNRF5 "-I{nrf.sdk.path}/components/toolchain/CMSIS/Include" "-I{nrf.sdk.path}/components/device" "-I{nrf.sdk.path}/components/drivers_nrf/hal" "-I{nrf.sdk.path}/components/drivers_nrf/clock" "-I{nrf.sdk.path}/components/drivers_nrf/common" "-I{nrf.sdk.path}/components/drivers_nrf/config" "-I{nrf.sdk.path}/components/drivers_nrf/delay" "-I{nrf.sdk.path}/components/drivers_nrf/uart" "-I{nrf.sdk.path}/components/drivers_nrf/rng" "-I{nrf.sdk.path}/components/libraries/util" "-I{nrf.sdk.path}/components/libraries/timer" "-I{nrf.sdk.path}/components/libraries/trace" "-I{nrf.sdk.path}/components/libraries/scheduler" "-I{nrf.sdk.path}/components/libraries/uart" "-I{nrf.sdk.path}/components/libraries/softuart" "-I{nrf.sdk.path}/components/libraries/fifo" "-I{nrf.sdk.path}/components/libraries/ecc" "-I{nrf.sdk.path}/components/nfc/ndef/connection_handover/ac_rec" "-I{nrf.sdk.path}/components/nfc/ndef/connection_handover/ep_oob_rec" "-I{nrf.sdk.path}/components/nfc/ndef/connection_handover/hs_rec" "-I{nrf.sdk.path}/components/nfc/ndef/connection_handover/le_oob_rec" "-I{nrf.sdk.path}/components/nfc/ndef/connection_handover" "-I{nrf.sdk.path}/components/nfc/ndef/generic/message" "-I{nrf.sdk.path}/components/nfc/ndef/generic/record" "-I{nrf.sdk.path}/components/nfc/ndef/launchapp" "-I{nrf.sdk.path}/components/nfc/ndef/parser/message" "-I{nrf.sdk.path}/components/nfc/ndef/parser/record" "-I{nrf.sdk.path}/components/nfc/ndef/text" "-I{nrf.sdk.path}/components/nfc/ndef/uri" "-I{nrf.sdk.path}/components/nfc/t2t_lib" "-I{nrf.sdk.path}/components/nfc/t2t_lib/hal_t2t" "-I{nrf.sdk.path}/components/nfc/t2t_parser" "-I{nrf.sdk.path}/components/nfc/t2t_lib" "-I{nrf.sdk.path}/components/ble/common" "-I{nrf.sdk.path}/components/softdevice/{softdevice}/headers" "-I{nrf.sdk.path}/components/softdevice/common/softdevice_handler" "-I{nrf.sdk.path}/components/toolchain" "-I{nrf.sdk.path}/components/toolchain/gcc" "-I{nrf.sdk.path}/components/drivers_nrf/pstorage" "-I{nrf.sdk.path}/components/drivers_nrf/pstorage/config" "-I{nrf.sdk.path}/components/libraries/fstorage" "-I{nrf.sdk.path}/components/libraries/fstorage/config" "-I{nrf.sdk.path}/components/libraries/experimental_section_vars" "-I{nrf.sdk.path}/components/ble/device_manager" "-I{nrf.sdk.path}/components/ble/device_manager/config" "-I{nrf.sdk.path}/components/ble/ble_services/ble_dfu" "-I{nrf.sdk.path}/components/libraries/bootloader_dfu" "-I{nrf.sdk.path}/components/ble/ble_advertising"
 
 # These can be overridden in platform.local.txt
 compiler.c.extra_flags=
@@ -70,10 +70,10 @@ compiler.elf2hex.extra_flags=
 # ----------------
 
 ## Compile c files
-recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {compiler.nrf.flags} {build.lfclk_flags} {includes} "{source_file}" -o "{object_file}"
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DSOFTDEVICE_PRESENT -DBLE_STACK_SUPPORT_REQD -DCONFIG_GPIO_AS_PINRESET -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {compiler.nrf.flags} {build.lfclk_flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile c++ files
-recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {compiler.nrf.flags} {build.lfclk_flags} {includes} "{source_file}" -o "{object_file}"
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -DSOFTDEVICE_PRESENT -DBLE_STACK_SUPPORT_REQD -DCONFIG_GPIO_AS_PINRESET -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {compiler.nrf.flags} {build.lfclk_flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile S files
 recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.S.extra_flags} {build.extra_flags} {build.lfclk_flags} {includes} "{source_file}" -o "{object_file}"
@@ -82,7 +82,8 @@ recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} -DF_CPU=
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}"  "-L{build.path}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} "-L{nrf.sdk.path}/components/toolchain/gcc/" "-L{nrf.sdk.path}/components/softdevice/{softdevice}/toolchain/armgcc/" "-T{build.ldscript}" "-Wl,-Map,{build.path}/{build.project_name}.map" --specs=nano.specs --specs=nosys.specs {compiler.ldflags} -o "{build.path}/{build.project_name}.elf" {object_files} -Wl,--start-group -lm "{build.path}/{archive_file}" -Wl,--end-group
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}"  "-L{build.path}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} "-L{nrf.sdk.path}/components/toolchain/gcc/" "-L{nrf.sdk.path}/components/softdevice/{softdevice}/toolchain/armgcc/" "-T{build.ldscript}" "-Wl,-Map,{build.path}/{build.project_name}.map" --specs=nano.specs --specs=nosys.specs {compiler.ldflags} -o "{build.path}/{build.project_name}.elf" {object_files} -Wl,--start-group -lm "{build.core.path}/SDK/components/nfc/t2t_lib/nfc_t2t_lib_gcc.a" "{build.path}/{archive_file}" -Wl,--end-group
+
 
 ## Create output (bin file)
 recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2bin.cmd}" {compiler.elf2bin.flags} {compiler.elf2bin.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
